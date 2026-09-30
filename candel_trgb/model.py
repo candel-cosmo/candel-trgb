@@ -1,18 +1,8 @@
 # Copyright (C) 2025 Richard Stiskalek
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-# Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Licensed under the MIT License; see LICENSE in the repository root.
 """TRGB-calibrated H0 forward model for EDD TRGB distance indicators."""
+from os.path import splitext
+
 import healpy as hp
 import jax.numpy as jnp
 import numpy as np
@@ -22,14 +12,15 @@ from jax.scipy.stats import norm as norm_jax
 from numpyro import deterministic, factor, sample
 from numpyro.distributions import Dirichlet, Normal, Uniform
 
-from ..util import (fprint, get_nested, radec_to_galactic,
-                    replace_prior_with_delta)
-from .base_model import H0ModelBase
-from .integration import ln_simpson_precomputed
-from .pv_utils import (galaxy_bias_needs_log_rho, lp_galaxy_bias, rsample,
-                       sample_galaxy_bias)
-from .utils import (log_prob_integrand_window_sel, logmeanexp,
-                    normal_logpdf_var, predict_cz)
+from candel.plotting.corner import plot_corner
+from candel.util import (fprint, get_nested, radec_to_galactic,
+                         replace_prior_with_delta)
+from candel.model.base_model import H0ModelBase
+from candel.model.integration import ln_simpson_precomputed
+from candel.model.pv_utils import (galaxy_bias_needs_log_rho, lp_galaxy_bias,
+                                   rsample, sample_galaxy_bias)
+from candel.model.utils import (log_prob_integrand_window_sel, logmeanexp,
+                                normal_logpdf_var, predict_cz)
 
 
 def _validate_healpix_nside(nside):
@@ -103,16 +94,6 @@ class TRGBModel(H0ModelBase):
                 and get_nested(config, "model/mag_lim_TRGB", None)
                 == "infer"):
             self._constrain_mag_lim_prior(config)
-        if which_sel == "SN_magnitude":
-            priors.setdefault("sigma_int_SN", {
-                "dist": "maxwell",
-                "scale": 0.0627,
-            })
-        else:
-            replace_prior_with_delta(
-                config, "M_B", -19.0, verbose=False)
-            replace_prior_with_delta(
-                config, "sigma_int_SN", 0.0, verbose=False)
 
         if not use_TRGB_host_redshift:
             replace_prior_with_delta(config, "H0", 73.04)
@@ -166,7 +147,6 @@ class TRGBModel(H0ModelBase):
     def _load_selection_thresholds(self):
         active_map = {
             "TRGB_magnitude": {"mag_lim_TRGB", "mag_lim_TRGB_width"},
-            "SN_magnitude": {"mag_lim_SN", "mag_lim_SN_width"},
             "TRGB_magnitude_redshift": {
                 "mag_lim_TRGB", "mag_lim_TRGB_width",
                 "cz_lim_selection", "cz_lim_selection_width"},
@@ -174,8 +154,6 @@ class TRGBModel(H0ModelBase):
         spec = {
             "mag_lim_TRGB":           None,
             "mag_lim_TRGB_width":     None,
-            "mag_lim_SN":             None,
-            "mag_lim_SN_width":       None,
             "cz_lim_selection":       3300.0,
             "cz_lim_selection_width": None,
         }
@@ -231,35 +209,10 @@ class TRGBModel(H0ModelBase):
     # ------------------------------------------------------------------
 
     def _load_data(self, data):
-        # Read SN-level data before super() processes the data dict.
-        self._has_sn_data = ("m_Bprime" in data
-                             and data["m_Bprime"] is not None)
-        if self._has_sn_data:
-            required = (
-                "sn_group_index", "m_Bprime",
-                "e_m_Bprime", "e_m_Bprime_median")
-            missing = [
-                key for key in required
-                if key not in data or data[key] is None
-            ]
-            if missing:
-                raise ValueError(
-                    "SN magnitude data are incomplete; missing "
-                    f"{', '.join(missing)}.")
-            self._sn_group_index = jnp.asarray(
-                data["sn_group_index"])
-            self._m_Bprime = jnp.asarray(data["m_Bprime"])
-            self._e_m_Bprime = jnp.asarray(data["e_m_Bprime"])
-            self._e2_m_Bprime = self._e_m_Bprime ** 2
-            self._e_m_Bprime_median = float(
-                data["e_m_Bprime_median"])
-            n_sn = len(self._m_Bprime)
-            n_hosts = len(np.unique(np.asarray(self._sn_group_index)))
-            fprint(f"loaded {n_sn} SNe across {n_hosts} hosts "
-                   f"for SN magnitude data.")
-
         super()._load_data(data)
         self.num_hosts = len(self.mag_obs)
+        # Typical host cz error, added to sigma_v in the selection kernels.
+        self.e2_cz_sel = float(np.median(self.e2_czcmb))
         self._has_trgb_colour = (
             hasattr(self, "colour_dered")
             and hasattr(self, "e_colour_dered"))
@@ -315,9 +268,7 @@ class TRGBModel(H0ModelBase):
     def _set_data_arrays(self, data):
         if data.get("host_names") is not None:
             self.host_names = np.asarray(data["host_names"], dtype=str)
-        skip = ("host_names", "sn_group_index", "m_Bprime",
-                "e_m_Bprime", "e_m_Bprime_median")
-        super()._set_data_arrays(data, skip_keys=skip)
+        super()._set_data_arrays(data, skip_keys=("host_names",))
 
     def _setup_no_recon_direction_grid(self):
         """Only the joint redshift selection needs no-reconstruction cuts."""
@@ -329,58 +280,9 @@ class TRGBModel(H0ModelBase):
     #  Validation
     # ------------------------------------------------------------------
 
-    def _validate_sn_data(self):
-        if not self._has_sn_data:
-            return
-        group_index = np.asarray(self._sn_group_index)
-        m_Bprime = np.asarray(self._m_Bprime)
-        e_m_Bprime = np.asarray(self._e_m_Bprime)
-
-        if group_index.ndim != 1:
-            raise ValueError("`sn_group_index` must be one-dimensional.")
-        if not np.issubdtype(group_index.dtype, np.integer):
-            raise ValueError("`sn_group_index` must contain integer indices.")
-        if m_Bprime.ndim != 1 or e_m_Bprime.ndim != 1:
-            raise ValueError("SN magnitude arrays must be one-dimensional.")
-        if not (len(group_index) == len(m_Bprime) == len(e_m_Bprime)):
-            raise ValueError(
-                "`sn_group_index`, `m_Bprime`, and `e_m_Bprime` must have "
-                "the same length.")
-        if len(group_index) == 0:
-            raise ValueError("SN magnitude data must contain at least one SN.")
-        if np.any(group_index < 0) or np.any(group_index >= self.num_hosts):
-            raise ValueError(
-                "`sn_group_index` entries must be in [0, num_hosts).")
-        if not np.all(np.isfinite(m_Bprime)):
-            raise ValueError("`m_Bprime` contains non-finite values.")
-        if not np.all(np.isfinite(e_m_Bprime)):
-            raise ValueError("`e_m_Bprime` contains non-finite values.")
-        if np.any(e_m_Bprime <= 0):
-            raise ValueError("`e_m_Bprime` entries must be positive.")
-        if not np.isfinite(self._e_m_Bprime_median) \
-                or self._e_m_Bprime_median <= 0:
-            raise ValueError("`e_m_Bprime_median` must be positive.")
-
-    def _validate_selection_width(self, name):
-        """Require fixed selection widths to be present and positive."""
-        if getattr(self, f"_infer_{name}", False):
-            return
-        value = getattr(self, name)
-        if value is None:
-            raise ValueError(
-                f"`{name}` must be set or 'infer' for "
-                f"{self.which_selection} selection.")
-        try:
-            value_arr = np.asarray(value, dtype=float)
-        except (TypeError, ValueError):
-            raise ValueError(f"`{name}` must be numeric, got {value!r}.")
-        if np.any(~np.isfinite(value_arr)) or np.any(value_arr <= 0):
-            raise ValueError(f"`{name}` must be positive, got {value!r}.")
-
     def _validate_active_selection_widths(self):
         width_names = {
             "TRGB_magnitude": ("mag_lim_TRGB_width",),
-            "SN_magnitude": ("mag_lim_SN_width",),
             "TRGB_magnitude_redshift": (
                 "mag_lim_TRGB_width", "cz_lim_selection_width"),
         }.get(self.which_selection, ())
@@ -451,8 +353,7 @@ class TRGBModel(H0ModelBase):
                     f"{', '.join(missing)}.")
 
         allowed_selection = [
-            "TRGB_magnitude", "SN_magnitude",
-            "TRGB_magnitude_redshift", None]
+            "TRGB_magnitude", "TRGB_magnitude_redshift", None]
         if self.which_selection not in allowed_selection:
             raise ValueError(
                 f"Unknown `which_selection`: {self.which_selection}. "
@@ -471,13 +372,6 @@ class TRGBModel(H0ModelBase):
                 raise ValueError(
                     "`model/TRGB_sky_exposure/kappa` must be positive.")
         self._validate_active_selection_widths()
-        self._validate_sn_data()
-
-        if self.which_selection == "SN_magnitude" \
-                and not self._has_sn_data:
-            raise ValueError(
-                "SN_magnitude selection requires SN data "
-                "(m_Bprime, e_m_Bprime) in the data dict.")
 
         needs_redshift_sel = (
             self.which_selection == "TRGB_magnitude_redshift")
@@ -504,56 +398,6 @@ class TRGBModel(H0ModelBase):
                 raise ValueError(
                     "`mag_lim_TRGB` must exceed `mag_min_TRGB` for "
                     f"{self.which_selection} selection.")
-        if self.which_selection == "SN_magnitude":
-            if self.mag_lim_SN is None \
-                    and not self._infer_mag_lim_SN:
-                raise ValueError(
-                    "`mag_lim_SN` must be set or 'infer' "
-                    "for SN_magnitude selection.")
-
-    def sigma_v_from_density(self, delta, sigma_v_low, sigma_v_high,
-                             log_rho_t, k):
-        """Map overdensity to sigma_v through a sigmoid in log density."""
-        rho = jnp.maximum(1.0 + delta, 1e-6)
-        log_rho = jnp.log(rho)
-        return sigma_v_low + (sigma_v_high - sigma_v_low) / (
-            1.0 + jnp.exp(-k * (log_rho - log_rho_t)))
-
-    def _volume_sigma_v_fields(self, sigma_v_low, sigma_v_high,
-                               log_rho_t, k):
-        """Evaluate density-dependent sigma_v on the 3D selection grid."""
-        if self.density_3d_mode == "log_rho":
-            delta_3d = jnp.exp(self.density_3d_fields) - 1.0
-        else:
-            delta_3d = self.density_3d_fields
-        return self.sigma_v_from_density(
-            delta_3d, sigma_v_low, sigma_v_high, log_rho_t, k)
-
-    def _sum_sn_terms_by_host(self, terms):
-        """Sum SN-level terms into their corresponding TRGB host bins."""
-        host_shape = (self.num_hosts,) + terms.shape[1:]
-        host_terms = jnp.zeros(host_shape)
-        return host_terms.at[self._sn_group_index].add(terms)
-
-    def _record_per_galaxy_log_likelihood(
-            self, ll_without_selection, ll_selection_observed,
-            log_selection_integral=0.0):
-        """Expose per-host likelihood terms as deterministic sites."""
-        if not self.save_log_likelihood_per_galaxy:
-            return
-
-        with_selection = (
-            ll_without_selection
-            + ll_selection_observed
-            - log_selection_integral
-        )
-        deterministic("log_likelihood_per_galaxy", ll_without_selection)
-        deterministic(
-            "log_observed_selection_per_galaxy",
-            ll_selection_observed)
-        deterministic("log_selection_integral", log_selection_integral)
-        deterministic(
-            "log_likelihood_per_galaxy_with_selection", with_selection)
 
     def __call__(self, **dynamic_attrs):
         if dynamic_attrs:
@@ -619,7 +463,6 @@ class TRGBModel(H0ModelBase):
         z_grid = self.distance2redshift(r_grid, h=h)
 
         log_S = None
-        ll_sn_host = None
         ll_observed_selection_host = jnp.zeros(self.num_hosts)
 
         if self._has_trgb_colour:
@@ -698,40 +541,11 @@ class TRGBModel(H0ModelBase):
                 self.mag_min_TRGB, mag_lim, mag_width,
                 cz_lim, cz_width, nu_cz=nu_cz)
 
-        elif self.which_selection == "SN_magnitude":
-            M_B = rsample("M_B", self.priors["M_B"])
-            sigma_int_SN = rsample(
-                "sigma_int_SN", self.priors["sigma_int_SN"])
-            mag_lim = self._resolve_threshold("mag_lim_SN")
-            mag_width = self._resolve_threshold("mag_lim_SN_width")
-
-            # Per-SN selection probability
-            ll_sel_sn = norm_jax.logcdf(
-                (mag_lim - self._m_Bprime) / mag_width)
-            factor("ll_sel_per_object", jnp.sum(ll_sel_sn))
-            ll_observed_selection_host = self._sum_sn_terms_by_host(
-                ll_sel_sn)
-
-            log_S = self._compute_volume_log_S_mag(
-                bias_params, M_B,
-                jnp.sqrt(self._e_m_Bprime_median**2 + sigma_int_SN**2),
-                H0, mag_lim, mag_width)
-
-            # SN magnitude likelihood on distance grid
-            # Per-SN: (n_sn, n_grid)
-            ll_sn_per = normal_logpdf_var(
-                self._m_Bprime[:, None],
-                M_B + mu_grid[None, :],
-                self._e2_m_Bprime[:, None] + sigma_int_SN**2)
-            # Sum SNe per host: (n_hosts, n_grid)
-            ll_sn_host = self._sum_sn_terms_by_host(ll_sn_per)
-
         self._call_marginalized(
             h, M_TRGB_host, e2_mag_host, ll_colour_host,
             sigma_v, beta, bias_params,
             Vext_rad_host, r_grid, lp_r, log_S,
             mu_grid=mu_grid, z_grid=z_grid,
-            ll_sn_host=ll_sn_host,
             ll_observed_selection_host=ll_observed_selection_host,
             Vext_mono_host_grid=Vext_mono_host_grid,
             nu_cz=nu_cz)
@@ -768,6 +582,53 @@ class TRGBModel(H0ModelBase):
 
         return lax.map(checkpoint(_one), self.density_3d_fields,
                        batch_size=self.volume_density_batch_size)
+
+    def extra_plots(self, samples, fname_out):
+        """Generate a corner plot for TRGB sky-exposure pixel fractions."""
+        if not getattr(self, "use_TRGB_sky_exposure", False):
+            return []
+
+        theta_key = next((
+            key for key in (
+                "TRGB_sky_exposure_ratio",
+                "TRGB_sky_exposure_theta_full",
+                "TRGB_sky_exposure_theta")
+            if key in samples), "TRGB_sky_exposure_theta")
+        if theta_key not in samples:
+            return []
+
+        theta = np.asarray(samples[theta_key])
+        theta = theta.reshape((theta.shape[0], -1))
+        if theta_key.endswith("_theta_full"):
+            pix = np.arange(theta.shape[1])
+        else:
+            pix = np.asarray(getattr(
+                self, "_TRGB_sky_exposure_support_pix",
+                np.arange(theta.shape[1]))).reshape(-1)
+            if len(pix) != theta.shape[1]:
+                pix = np.arange(theta.shape[1])
+
+        keep = [
+            i for i in range(theta.shape[1])
+            if np.all(np.isfinite(theta[:, i])) and np.ptp(theta[:, i]) > 0
+        ]
+        if not keep:
+            return []
+        if len(keep) > 50:
+            fprint("Skipping corner plot of TRGB sky-exposure pixel fractions "
+                   f"with {len(keep)} pixels.")
+            return []
+
+        fname_plot = (
+            splitext(fname_out)[0] + "_corner_TRGB_sky_exposure.png")
+        prefix = ("sky_ratio_pix" if theta_key.endswith("_ratio")
+                  else "sky_frac_pix")
+        theta_samples = {
+            f"{prefix}_{int(pix[i])}": theta[:, i]
+            for i in keep
+        }
+        plot_corner(theta_samples, show_fig=False, filename=fname_plot)
+        return [("TRGB sky-exposure pixel-fraction corner plot", fname_plot)]
 
     # ------------------------------------------------------------------
     #  Distance marginalization path
@@ -851,7 +712,6 @@ class TRGBModel(H0ModelBase):
                            ll_colour_host, sigma_v, beta, bias_params,
                            Vext_rad_host, r_grid, lp_r, log_S,
                            mu_grid=None, z_grid=None,
-                           ll_sn_host=None,
                            ll_observed_selection_host=None,
                            Vext_mono_host_grid=None,
                            nu_cz=None):
@@ -911,8 +771,6 @@ class TRGBModel(H0ModelBase):
             # selection integral; no-selection runs subtract the 3D prior
             # integral over the finite reconstruction volume.
             integrand = lp_dist_w + ll_mag[None, :, :] + ll_cz
-            if ll_sn_host is not None:
-                integrand = integrand + ll_sn_host[None, :, :]
             if not self.apply_sel:
                 in_volume = rh_grid <= self.selection_integral_grid_radius
                 integrand = jnp.where(in_volume[None, None, :],
@@ -967,8 +825,6 @@ class TRGBModel(H0ModelBase):
             # same unnormalized r^2 measure as the selection integral so the
             # prior normalization cancels.
             integrand = lp_dist + ll_mag + ll_cz
-            if ll_sn_host is not None:
-                integrand = integrand + ll_sn_host
             ll_host = ln_simpson_precomputed(integrand, log_w, axis=-1)
 
             if self.apply_sel:

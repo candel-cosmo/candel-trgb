@@ -1,27 +1,16 @@
 # Copyright (C) 2026 Richard Stiskalek
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-# Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Licensed under the MIT License; see LICENSE in the repository root.
 """Mock generator for TRGB surveys."""
 import numpy as np
 from scipy.stats import norm
 
-from ..cosmo.cosmography import Distance2Distmod, Distance2Redshift
-from ..util import (SPEED_OF_LIGHT, galactic_to_radec_cartesian,
-                    radec_to_cartesian, radec_to_galactic)
-from ._field_utils import (build_field_pool_evaluator, field_xyz_to_radec,
-                           galaxy_bias_log_weight,
-                           galaxy_bias_params_from_values)
+from candel.cosmo.cosmography import Distance2Distmod, Distance2Redshift
+from candel.util import (SPEED_OF_LIGHT, galactic_to_radec_cartesian,
+                         radec_to_cartesian, radec_to_galactic)
+from candel.field.mock_utils import (build_field_pool_evaluator,
+                                     field_xyz_to_radec,
+                                     galaxy_bias_log_weight,
+                                     galaxy_bias_params_from_values)
 
 DEFAULT_TRUE_PARAMS = {
     "H0": 73.0,
@@ -275,7 +264,7 @@ def _gen_field_path(nsamples, h, beta, rmin, rmax, e_mag, e_czcmb,
         # --- Interpolate full LOS for selected hosts ---
         if verbose:
             print(f"  interpolating LOS for {nsamples} hosts...")
-        from ..field import interpolate_los_density_velocity
+        from candel.field import interpolate_los_density_velocity
         los_density, los_velocity = interpolate_los_density_velocity(
             field_loader, r_grid, collected["RA"], collected["dec"],
             field_smoothing_scale=field_smoothing_scale, verbose=verbose)
@@ -406,18 +395,14 @@ def gen_TRGB_mock(nsamples=480, Om=0.3, e_mag=0.05, e_czcmb=10.0,
         "e_mu_N4258_anchor": anch["e_mu_N4258"],
         "mag_N4258_TRGB": mag_N4258_obs,
         "e_mag_N4258_TRGB": anch["e_mag_N4258_TRGB"],
-        "has_rand_los": False,
     }
     if e_colour_dered is not None:
         data["e_colour_dered"] = np.full(n_kept, e_colour_dered)
 
-    # Add host LOS data for field-based mocks. Reconstruction integrals use
-    # 3D density data, not random LOS.
+    # Add host LOS data for field-based mocks.
     for k in ["host_los_density", "host_los_velocity", "host_los_r"]:
         if k in collected:
             data[k] = collected[k]
-    if "host_los_r" in collected:
-        data["has_rand_los"] = False
     if density_3d_data is not None:
         data.update(density_3d_data)
         data["has_volume_density_3d"] = True

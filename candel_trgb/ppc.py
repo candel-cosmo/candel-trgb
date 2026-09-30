@@ -1,17 +1,5 @@
 # Copyright (C) 2026 Richard Stiskalek
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-# Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Licensed under the MIT License; see LICENSE in the repository root.
 """Posterior predictive check for the EDD TRGB H0 model."""
 import contextlib
 import io
@@ -26,17 +14,19 @@ from astropy.cosmology import FlatLambdaCDM
 from scipy.stats import ks_2samp, norm
 from tqdm.auto import tqdm
 
-from ..field import name2field_loader
-from ..pvdata.field_products import (
+from candel.field import name2field_loader
+from candel.field.field_products import (
     field_smoothing_scale_from_config,
     velocity_field_smoothing_scale_from_config)
-from ..pvdata.volume_density import _density_unit_normalization
-from ..util import (SPEED_OF_LIGHT, fprint, galactic_to_radec,
-                    galactic_to_radec_cartesian, get_nested, load_config,
-                    radec_to_cartesian, radec_to_galactic)
-from ._field_utils import (build_field_pool, build_field_pool_evaluator,
-                           compute_r_max_selection,
-                           galaxy_bias_params_from_values, galaxy_bias_weight)
+from candel.field.volume_density import _density_unit_normalization
+from candel.util import (SPEED_OF_LIGHT, fprint, galactic_to_radec,
+                         galactic_to_radec_cartesian, get_nested, load_config,
+                         radec_to_cartesian, radec_to_galactic)
+from candel.field.mock_utils import (build_field_pool,
+                                     build_field_pool_evaluator,
+                                     compute_r_max_selection,
+                                     galaxy_bias_params_from_values,
+                                     galaxy_bias_weight)
 
 _PPC_PROGRESS_QUEUE = None
 

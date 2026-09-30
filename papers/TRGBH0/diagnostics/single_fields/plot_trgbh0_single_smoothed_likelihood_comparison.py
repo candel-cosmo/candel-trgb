@@ -101,10 +101,8 @@ def get_nested(mapping, keys, default=None):
 
 
 def active_reconstruction(config):
-    return (
-        get_nested(config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
-        or get_nested(config, ("io", "CCHP", "reconstruction"))
-    )
+    return get_nested(
+        config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
 
 
 def task_specs(task_file, smooth_R, mas):

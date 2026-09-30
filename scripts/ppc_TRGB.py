@@ -7,11 +7,12 @@ import os
 import numpy as np
 
 import candel
+import candel_trgb
 from candel import get_nested
-from candel.mock import (generate_trgb_ppc, plot_trgb_ppc,
+from candel_trgb import (generate_trgb_ppc, plot_trgb_ppc,
                          plot_trgb_ppc_distance, plot_trgb_ppc_sky,
                          plot_trgb_ppc_sky_exposure)
-from candel.mock.ppc_trgb import _available_field_indices
+from candel_trgb.ppc import _available_field_indices
 
 _WORKER_SAMPLES = None
 _WORKER_DATA = None
@@ -24,12 +25,9 @@ def _load_trgb_data(config_path):
     config = candel.load_config(config_path, replace_los_prior=False)
     which_run = get_nested(config, "model/which_run", "EDD_TRGB")
     if which_run == "EDD_TRGB":
-        return candel.pvdata.load_EDD_TRGB_from_config(config_path)
-    if which_run == "EDD_TRGB_grouped":
-        return candel.pvdata.load_EDD_TRGB_grouped_from_config(config_path)
+        return candel_trgb.load_EDD_TRGB_from_config(config_path)
     raise ValueError(
-        f"TRGB PPC expects model.which_run EDD_TRGB or EDD_TRGB_grouped, "
-        f"got {which_run!r}.")
+        f"TRGB PPC expects model.which_run EDD_TRGB, got {which_run!r}.")
 
 
 def _parse_field_indices(value, data):

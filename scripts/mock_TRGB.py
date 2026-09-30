@@ -27,10 +27,11 @@ import tomli_w
 from scipy.stats import kstest
 
 import candel
-from candel.mock import gen_TRGB_mock
-from candel.mock.TRGB_mock import DEFAULT_ANCHORS, DEFAULT_TRUE_PARAMS
+import candel_trgb
+from candel_trgb import gen_TRGB_mock
+from candel_trgb.mock import DEFAULT_ANCHORS, DEFAULT_TRUE_PARAMS
 from candel.model.pv_utils import GALAXY_BIAS_MODELS
-from candel.pvdata.field_cache import (
+from candel.field.field_cache import (
     _field_cache_dir_from_config, _field_cache_project_from_config)
 from candel.util import results_path
 
@@ -38,10 +39,7 @@ matplotlib.use("Agg")
 
 
 REPO_ROOT = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        ".."))
+    os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 TRACKED_PARAMS = ["H0", "M_TRGB", "alpha_c", "c_star", "c_bar", "w_c",
                   "sigma_int", "sigma_v", "nu_cz",
@@ -321,7 +319,7 @@ def _load_density_3d_data(config, field_name, field_index=0):
     if field_name is None:
         raise ValueError("`field_name` is required for field-based mocks.")
 
-    from candel.pvdata.volume_density import (
+    from candel.field.volume_density import (
         _h0_volume_supersampling_from_config, _load_volume_data_for_H0)
 
     recon = config.get("io", {}).get("reconstruction_main", {})
@@ -447,13 +445,13 @@ def run_one_mock(seed, base_config_path, true_params, mock_kwargs,
         if quiet:
             with open(os.devnull, "w") as _devnull, \
                     redirect_stdout(_devnull):
-                model = candel.model.TRGBModel(tmp, data)
-                samples, diagnostics = candel.run_H0_inference(
+                model = candel_trgb.TRGBModel(tmp, data)
+                samples, diagnostics = candel.run_inference(
                     model, save_samples=False, print_summary=False,
                     progress_bar=progress_bar, return_diagnostics=True)
         else:
-            model = candel.model.TRGBModel(tmp, data)
-            samples, diagnostics = candel.run_H0_inference(
+            model = candel_trgb.TRGBModel(tmp, data)
+            samples, diagnostics = candel.run_inference(
                 model, save_samples=False, print_summary=True,
                 return_diagnostics=True)
 
@@ -1077,8 +1075,8 @@ def run_single(seed, true_params, mock_kwargs, config_path,
     if not plot_only:
         tmp = _write_tmp_config(config)
         try:
-            model = candel.model.TRGBModel(tmp, data)
-            samples = candel.run_H0_inference(
+            model = candel_trgb.TRGBModel(tmp, data)
+            samples = candel.run_inference(
                 model, save_samples=False, print_summary=True)
         finally:
             os.unlink(tmp)
@@ -1096,7 +1094,7 @@ def run_single(seed, true_params, mock_kwargs, config_path,
 
     # Load real data for comparison (suppress loader prints)
     with open(os.devnull, "w") as devnull, redirect_stdout(devnull):
-        real = candel.pvdata.load_EDD_TRGB_from_config(config_path)
+        real = candel_trgb.load_EDD_TRGB_from_config(config_path)
     mag_real = np.asarray(real["mag_obs"])
     cz_real = np.asarray(real["czcmb"])
 
@@ -1166,7 +1164,7 @@ def main():
         type=str,
         default=os.path.join(
             REPO_ROOT,
-            "scripts/runs/configs/config_EDD_TRGB.toml"),
+            "packages/candel-trgb/configs/config_EDD_TRGB.toml"),
         help="Base config for inference settings")
     parser.add_argument("--outdir",
                         default=results_path("results/mocks_TRGB"),
@@ -1385,7 +1383,7 @@ def main():
         import inspect
 
         from candel.field import name2field_loader
-        from candel.pvdata.volume_density import _density_unit_normalization
+        from candel.field.volume_density import _density_unit_normalization
         config = candel.load_config(args.config, replace_los_prior=False)
         field_config = dict(
             config["io"]["reconstruction_main"][args.field_name])

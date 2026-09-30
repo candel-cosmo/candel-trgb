@@ -104,11 +104,8 @@ def get_nested_default(mapping, keys, default=None):
 
 
 def active_reconstruction(config):
-    return (
-        get_nested_default(
-            config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
-        or get_nested_default(config, ("io", "CCHP", "reconstruction"))
-    )
+    return get_nested_default(
+        config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
 
 
 def reconstruction_label(reconstruction, mas):

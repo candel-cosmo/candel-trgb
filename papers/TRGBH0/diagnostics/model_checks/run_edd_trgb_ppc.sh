@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
-OUTDIR="$ROOT/notebooks/paper_TRGBH0/output/model_checks"
+ROOT="${CANDEL_ROOT:-$(cd "$SCRIPT_DIR/../../../../../.." && pwd)}"
+OUTDIR="$ROOT/packages/candel-trgb/papers/TRGBH0/output/model_checks"
 PYTHON="${CANDEL_PYTHON:-$ROOT/venv_candel/bin/python}"
 # PPC_FACTOR="${CANDEL_PPC_FACTOR:-10}"
 PPC_FACTOR=10

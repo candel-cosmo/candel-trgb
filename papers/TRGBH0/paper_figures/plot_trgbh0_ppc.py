@@ -31,7 +31,8 @@ from trgbh0_plot_style import (OUTPUT_DIR, ROOT,  # noqa: E402
                                TRGBH0_RESULTS, TRGBH0_TABLE_RESULTS)
 
 import candel  # noqa: E402
-from candel.mock import (generate_trgb_ppc, plot_trgb_ppc,  # noqa: E402
+import candel_trgb  # noqa: E402
+from candel_trgb import (generate_trgb_ppc, plot_trgb_ppc,  # noqa: E402
                          plot_trgb_ppc_distance, plot_trgb_ppc_sky)
 
 matplotlib.use("Agg")
@@ -76,13 +77,12 @@ def load_observed_data(config):
     data_config = copy.deepcopy(config)
     data_config.setdefault("model", {})["use_reconstruction"] = False
     data_config.setdefault("io", {})["load_host_los"] = False
-    data_config["io"]["load_rand_los"] = False
     with tempfile.NamedTemporaryFile(
             mode="wb", suffix=".toml", delete=False) as handle:
         tmp_path = Path(handle.name)
         tomli_w.dump(data_config, handle)
     try:
-        return candel.pvdata.load_EDD_TRGB_from_config(str(tmp_path))
+        return candel_trgb.load_EDD_TRGB_from_config(str(tmp_path))
     finally:
         tmp_path.unlink(missing_ok=True)
 

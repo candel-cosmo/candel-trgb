@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ROOT = SCRIPT_DIR.parents[1]
+ROOT = SCRIPT_DIR.parents[3]
 OUTPUT_DIR = SCRIPT_DIR / "output"
 PAPER_DIR = ROOT.parent / "Papers" / "TRGBH0"
 PAPER_FIGURE_DIR = PAPER_DIR / "Figures"

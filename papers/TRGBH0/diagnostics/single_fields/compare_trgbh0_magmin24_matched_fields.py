@@ -117,10 +117,8 @@ def task_config_paths(task_file):
 
 
 def active_reconstruction(config):
-    return (
-        get_nested(config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
-        or get_nested(config, ("io", "CCHP", "reconstruction"))
-    )
+    return get_nested(
+        config, ("io", "PV_main", "EDD_TRGB", "reconstruction"))
 
 
 def is_delta_beta_one(config):

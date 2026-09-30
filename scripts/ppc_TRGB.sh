@@ -2,8 +2,8 @@
 # Submit or run a standalone TRGB posterior predictive check.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-# shellcheck source=../_submit_lib.sh
+ROOT="${CANDEL_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
+# shellcheck source=../../../scripts/_submit_lib.sh
 source "$ROOT/scripts/_submit_lib.sh"
 
 queue=""
@@ -70,7 +70,7 @@ if ! $local_mode && [[ -z "$queue" ]]; then
     exit 2
 fi
 
-cmd=("$CANDEL_PYTHON" -u "$ROOT/scripts/mocks/ppc_TRGB.py"
+cmd=("$CANDEL_PYTHON" -u "$ROOT/packages/candel-trgb/scripts/ppc_TRGB.py"
      --config "$config"
      --posterior "$posterior"
      --seed "$seed"

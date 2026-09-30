@@ -1,7 +1,7 @@
 # TRGBH0 Manticore Evidence-Driver Study
 
 This note summarises the diagnostic we are running on the TRGB-only H0 single-field Manticore runs.
-The current analysis uses the 50 COLA fields in `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv`.
+The current analysis uses the 50 COLA fields in `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv`.
 
 ## Question
 
@@ -91,22 +91,22 @@ The key robustness question is whether this selection-normalisation sensitivity 
 
 Analysis script:
 
-`/mnt/users/rstiskalek/CANDEL/papers/TRGBH0/diagnostics/single_fields/plot_trgbh0_manticore_evidence_drivers.py`
+`/mnt/users/rstiskalek/candel-cosmo/candel/papers/TRGBH0/diagnostics/single_fields/plot_trgbh0_manticore_evidence_drivers.py`
 
 Run:
 
 ```bash
-/mnt/users/rstiskalek/CANDEL/venv_candel/bin/python \
-  /mnt/users/rstiskalek/CANDEL/papers/TRGBH0/diagnostics/single_fields/plot_trgbh0_manticore_evidence_drivers.py \
+/mnt/users/rstiskalek/candel-cosmo/candel/venv_candel/bin/python \
+  /mnt/users/rstiskalek/candel-cosmo/candel/papers/TRGBH0/diagnostics/single_fields/plot_trgbh0_manticore_evidence_drivers.py \
   --field-set cola \
-  --results-dir /mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv \
-  --output-dir /mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots
+  --results-dir /mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv \
+  --output-dir /mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots
 ```
 
 Main outputs:
 
-- `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_evidence_driver_summary_cola.txt`
-- `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_best_field_components_cola.png`
-- `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_best_field_galaxy_deltas_cola.png`
-- `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_evidence_driver_metrics_cola.png`
-- `/mnt/users/rstiskalek/CANDEL/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_galaxy_likelihood_heatmap_cola.png`
+- `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_evidence_driver_summary_cola.txt`
+- `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_best_field_components_cola.png`
+- `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_best_field_galaxy_deltas_cola.png`
+- `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_evidence_driver_metrics_cola.png`
+- `/mnt/users/rstiskalek/candel-cosmo/candel/results/TRGBH0_paper/manticore_fields_const_sigv/plots/trgbh0_manticore_galaxy_likelihood_heatmap_cola.png`

@@ -15,8 +15,8 @@ Shared paths, colours, rc settings, colormaps, and save helpers live in
 Build paper figures with:
 
 ```bash
-/mnt/users/rstiskalek/CANDEL/venv_candel/bin/python \
-  /mnt/users/rstiskalek/CANDEL/papers/TRGBH0/build_trgbh0_figures.py
+/mnt/users/rstiskalek/candel-cosmo/candel/venv_candel/bin/python \
+  /mnt/users/rstiskalek/candel-cosmo/candel/papers/TRGBH0/build_trgbh0_figures.py
 ```
 
 To also copy generated PDFs into the paper source tree, pass:

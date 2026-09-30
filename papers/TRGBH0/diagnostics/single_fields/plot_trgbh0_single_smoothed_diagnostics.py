@@ -26,7 +26,8 @@ import scienceplots  # noqa: F401,E402
 from matplotlib.colors import Normalize  # noqa: E402
 from matplotlib.ticker import MaxNLocator  # noqa: E402
 from scipy.stats import gaussian_kde, pearsonr, spearmanr  # noqa: E402
-from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR, ROOT,  # noqa: E402,F401
+from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR,  # noqa: E402,F401
+                               RESULTS_ROOT, ROOT,
                                TRGBH0_COLOURS, save_pdf_png, set_paper_rc,
                                trgbh0_cmap)
 
@@ -165,8 +166,8 @@ def task_specs(task_file, cz_likelihood):
                 "family": (
                     f"{which_bias} {recon_label} R={smooth_R:g}"),
                 "config": str(config_path),
-                "source": str(repo_path(get_nested(
-                    config, ("io", "fname_output")))),
+                "source": str(RESULTS_ROOT / get_nested(
+                    config, ("io", "fname_output"))),
             })
     if not specs:
         raise ValueError(f"No task configs found in `{task_file}`.")

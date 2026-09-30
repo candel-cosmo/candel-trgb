@@ -4,7 +4,8 @@
 set -euo pipefail
 
 PKG_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# Core CANDEL checkout (data/, results/, local_config.toml); defaults
+# Core CANDEL checkout (local_config.toml, which locates data/ and
+# results/); defaults
 # to a sibling clone of candel-cosmo/CANDEL.
 ROOT="${CANDEL_ROOT:-$(cd "$PKG_ROOT/../CANDEL" 2>/dev/null && pwd)}"
 [[ -f "$ROOT/scripts/_submit_lib.sh" ]] || {
@@ -34,7 +35,7 @@ default_manticore=false
 fix_selection=true
 fix_Vext=false
 config="$PKG_ROOT/configs/config_EDD_TRGB.toml"
-outdir="$ROOT/results/mocks_TRGB"
+outdir="$CANDEL_ROOT_RESULTS/results/mocks_TRGB"
 extra_args=""
 local_mode=false
 single_mode=false

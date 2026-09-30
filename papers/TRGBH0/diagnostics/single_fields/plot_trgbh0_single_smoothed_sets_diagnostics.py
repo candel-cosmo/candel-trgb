@@ -31,11 +31,11 @@ import scienceplots  # noqa: F401,E402
 from matplotlib.colors import Normalize  # noqa: E402
 from matplotlib.ticker import MaxNLocator  # noqa: E402
 from scipy.stats import gaussian_kde, pearsonr, spearmanr  # noqa: E402
-from trgbh0_plot_style import (OUTPUT_DIR, ROOT, save_pdf_png,  # noqa: E402
-                               set_paper_rc, trgbh0_cmap)
+from trgbh0_plot_style import (OUTPUT_DIR, save_pdf_png,  # noqa: E402
+                               RESULTS_ROOT, set_paper_rc, trgbh0_cmap)
 
 DEFAULT_RESULTS_DIR = (
-    ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
+    RESULTS_ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
 DEFAULT_OUTDIR = OUTPUT_DIR / "trgbh0_single_smoothed_sets"
 FILE_GLOB = "*_single_smoothed.hdf5"
 MAX_KDE_SAMPLES = 40_000

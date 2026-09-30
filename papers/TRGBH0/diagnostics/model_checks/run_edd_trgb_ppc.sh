@@ -3,11 +3,14 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PKG_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
-# Core CANDEL checkout (data/, results/, local_config.toml); defaults
+# Core CANDEL checkout (local_config.toml, which locates data/ and
+# results/); defaults
 # to a sibling clone of candel-cosmo/CANDEL.
 ROOT="${CANDEL_ROOT:-$(cd "$PKG_ROOT/../CANDEL" 2>/dev/null && pwd)}"
 [[ -f "$ROOT/scripts/_submit_lib.sh" ]] || {
     echo "[ERROR] Set CANDEL_ROOT to the CANDEL core checkout." >&2; exit 1; }
+# shellcheck source=/dev/null
+source "$ROOT/scripts/_submit_lib.sh"  # CANDEL_ROOT_RESULTS, CANDEL_PYTHON
 OUTDIR="$PKG_ROOT/papers/TRGBH0/output/model_checks"
 PYTHON="${CANDEL_PYTHON:-$ROOT/venv_candel/bin/python}"
 # PPC_FACTOR="${CANDEL_PPC_FACTOR:-10}"
@@ -41,7 +44,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 # Carrick2015 reconstruction: Gaussian cz likelihood with sky exposure.
 "$PYTHON" "$SCRIPT_DIR/make_edd_trgb_ppc.py" \
     --mode carrick \
-    --posterior "$ROOT/results/TRGBH0_paper/table/EDD_TRGB_sel-TRGB_magnitude_bmin10_skyhp_nside2_k192_Carrick2015_main.hdf5" \
+    --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/table/EDD_TRGB_sel-TRGB_magnitude_bmin10_skyhp_nside2_k192_Carrick2015_main.hdf5" \
     --b-min "$B_MIN" \
     --ppc-factor "$PPC_FACTOR" \
     --n-workers "$PPC_N_WORKERS" \
@@ -52,7 +55,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 # Carrick2015 reconstruction: Gaussian cz likelihood with sky exposure.
 "$PYTHON" "$SCRIPT_DIR/make_edd_trgb_ppc.py" \
     --mode carrick \
-    --posterior "$ROOT/results/TRGBH0_paper/table/EDD_TRGB_sel-TRGB_magnitude_bmin10_skyhp_nside1_k48_Carrick2015_main.hdf5" \
+    --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/table/EDD_TRGB_sel-TRGB_magnitude_bmin10_skyhp_nside1_k48_Carrick2015_main.hdf5" \
     --b-min "$B_MIN" \
     --ppc-factor "$PPC_FACTOR" \
     --n-workers "$PPC_N_WORKERS" \
@@ -64,7 +67,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 # "$PYTHON" "$SCRIPT_DIR/make_edd_trgb_ppc.py" \
 #     --mode carrick \
 #     --vmono \
-#     --posterior "$ROOT/results/TRGBH0_paper/table/EDD_TRGB_Vmono_cz-student_t_sel-TRGB_magnitude_bmin10_Carrick2015_main.hdf5" \
+#     --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/table/EDD_TRGB_Vmono_cz-student_t_sel-TRGB_magnitude_bmin10_Carrick2015_main.hdf5" \
 #     --b-min "$B_MIN" \
 #     --ppc-factor "$PPC_FACTOR" \
 #     --output "$OUTDIR/trgbh0_edd_trgb_carrick_vmono_bmin${B_MIN_TAG}_student_t_ppc.pdf"
@@ -74,7 +77,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 #     --mode carrick \
 #     --vmono \
 #     --voct \
-#     --posterior "$ROOT/results/TRGBH0_paper/table/EDD_TRGB_Vmono_Voct_cz-student_t_sel-TRGB_magnitude_bmin10_Carrick2015_main.hdf5" \
+#     --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/table/EDD_TRGB_Vmono_Voct_cz-student_t_sel-TRGB_magnitude_bmin10_Carrick2015_main.hdf5" \
 #     --b-min "$B_MIN" \
 #     --ppc-factor "$PPC_FACTOR" \
 #     --sky-mask-nside 1 \
@@ -84,7 +87,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 # Carrick2015 reconstruction: Student-t cz likelihood.
 # "$PYTHON" "$SCRIPT_DIR/make_edd_trgb_ppc.py" \
 #     --mode carrick \
-#     --posterior "$ROOT/results/TRGBH0_paper/table/EDD_TRGB_cz-student_t_sel-TRGB_magnitude_Carrick2015_main.hdf5" \
+#     --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/table/EDD_TRGB_cz-student_t_sel-TRGB_magnitude_Carrick2015_main.hdf5" \
 #     --b-min "$B_MIN" \
 #     --ppc-factor "$PPC_FACTOR" \
 #     --output "$OUTDIR/trgbh0_edd_trgb_carrick_bmin${B_MIN_TAG}_student_t_ppc.pdf"
@@ -93,7 +96,7 @@ echo "[INFO] PPC workers: $PPC_N_WORKERS"
 # "$PYTHON" "$SCRIPT_DIR/make_edd_trgb_ppc.py" \
 #     --mode manticore \
 #     --field-index "$MANTICORE_FIELD_INDEX" \
-#     --posterior "$ROOT/results/TRGBH0_paper/single_fields/EDD_TRGB_rhoSmoothR4_cz-student_t_MAS-PCS_sel-TRGB_magnitude_ManticoreLocalCOLA_${MANTICORE_FIELD_TAG}_single.hdf5" \
+#     --posterior "$CANDEL_ROOT_RESULTS/results/TRGBH0_paper/single_fields/EDD_TRGB_rhoSmoothR4_cz-student_t_MAS-PCS_sel-TRGB_magnitude_ManticoreLocalCOLA_${MANTICORE_FIELD_TAG}_single.hdf5" \
 #     --b-min "$B_MIN" \
 #     --ppc-factor "$PPC_FACTOR" \
 #     --output "$OUTDIR/trgbh0_edd_trgb_manticore_${MANTICORE_FIELD_TAG}_bmin${B_MIN_TAG}_student_t_ppc.pdf"

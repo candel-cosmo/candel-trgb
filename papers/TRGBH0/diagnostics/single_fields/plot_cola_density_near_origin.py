@@ -8,7 +8,7 @@ from pathlib import Path
 
 import h5py
 import matplotlib
-from trgbh0_plot_style import ROOT
+from trgbh0_plot_style import RESULTS_ROOT
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
@@ -32,7 +32,7 @@ SOURCE_ROOT = (
     / "forward_fields"
 )
 OUTDIR = (
-    ROOT
+    RESULTS_ROOT
     / "results"
     / "TRGBH0_paper"
     / "manticore_fields_const_sigv"

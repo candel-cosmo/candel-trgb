@@ -25,7 +25,8 @@ import numpy as np  # noqa: E402
 import scienceplots  # noqa: F401,E402
 from matplotlib.colors import Normalize  # noqa: E402
 from scipy.stats import gaussian_kde  # noqa: E402
-from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR, ROOT,  # noqa: E402,F401
+from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR,  # noqa: E402,F401
+                               RESULTS_ROOT, ROOT,
                                TRGBH0_COLOURS, save_pdf_png, set_paper_rc,
                                trgbh0_cmap)
 
@@ -145,8 +146,8 @@ def task_specs(task_file, smooth_R, mas):
                 "which_selection": get_nested(
                     config, ("model", "which_selection"), ""),
                 "config": str(config_path),
-                "source": str(repo_path(get_nested(
-                    config, ("io", "fname_output")))),
+                "source": str(RESULTS_ROOT / get_nested(
+                    config, ("io", "fname_output"))),
             })
     if not specs:
         raise ValueError(

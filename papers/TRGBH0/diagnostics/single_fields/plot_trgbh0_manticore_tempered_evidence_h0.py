@@ -22,10 +22,11 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import scienceplots  # noqa: E402,F401
 from matplotlib.colors import Normalize  # noqa: E402
-from trgbh0_plot_style import (FIGURE_DPI, ROOT,  # noqa: E501,E402,F401
+from trgbh0_plot_style import (FIGURE_DPI, RESULTS_ROOT,  # noqa: E501,E402,F401
                                save_pdf_png, set_paper_rc, trgbh0_cmap)
 
-RESULTS = ROOT / "results" / "TRGBH0_paper" / "manticore_fields_const_sigv"
+RESULTS = (RESULTS_ROOT / "results" / "TRGBH0_paper"
+           / "manticore_fields_const_sigv")
 DEFAULT_OUTDIR = RESULTS / "plots"
 PATTERNS = {
     "gaussian": (

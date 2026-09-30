@@ -8,7 +8,8 @@ from pathlib import Path
 
 import h5py
 import matplotlib
-from trgbh0_plot_style import FIGURE_DPI, ROOT, TRGBH0_COLOURS, set_paper_rc
+from trgbh0_plot_style import (FIGURE_DPI, RESULTS_ROOT, TRGBH0_COLOURS,
+                               set_paper_rc)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
@@ -28,7 +29,8 @@ from trgbh0_plot_style import save_pdf_png as save_pdf_png_common  # noqa: E402
 from candel.plotting.selection_diagnostics import \
     plot_raw_selection_evidence  # noqa: E402
 
-RESULTS = ROOT / "results" / "TRGBH0_paper" / "manticore_fields_const_sigv"
+RESULTS = (RESULTS_ROOT / "results" / "TRGBH0_paper"
+           / "manticore_fields_const_sigv")
 DEFAULT_OUTDIR = RESULTS / "plots"
 FIELD_RE = re.compile(r"_field(\d+)_")
 PATTERNS = {

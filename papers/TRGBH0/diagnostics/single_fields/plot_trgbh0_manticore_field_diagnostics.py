@@ -10,7 +10,8 @@ from pathlib import Path
 
 import h5py
 import matplotlib
-from trgbh0_plot_style import FIGURE_DPI, ROOT, set_paper_rc, trgbh0_cmap
+from trgbh0_plot_style import (FIGURE_DPI, RESULTS_ROOT, set_paper_rc,
+                               trgbh0_cmap)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
@@ -32,7 +33,8 @@ from scipy.stats import (gaussian_kde, ks_2samp, pearsonr,  # noqa: E402
                          spearmanr)
 from trgbh0_plot_style import save_pdf_png as save_pdf_png_common  # noqa: E402
 
-RESULTS = ROOT / "results" / "TRGBH0_paper" / "manticore_fields_const_sigv"
+RESULTS = (RESULTS_ROOT / "results" / "TRGBH0_paper"
+           / "manticore_fields_const_sigv")
 DEFAULT_OUTDIR = RESULTS / "plots"
 MANTICORE_SCHEDULE = (
     Path("/mnt/extraspace/rstiskalek/MANTICORE")

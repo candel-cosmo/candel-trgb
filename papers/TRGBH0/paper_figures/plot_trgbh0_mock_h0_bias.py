@@ -15,14 +15,15 @@ for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR, ROOT,  # noqa: E402
-                               TRGBH0_COLOURS, paper_style, save_figure)
+from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR,  # noqa: E402
+                               RESULTS_ROOT, TRGBH0_COLOURS, paper_style,
+                               save_figure)
 
 matplotlib.use("Agg")
 import scienceplots  # noqa: E402,F401
 
 MOCK_NPZ = (
-    ROOT / "results" / "mocks_TRGB"
+    RESULTS_ROOT / "results" / "mocks_TRGB"
     / "mock_TRGB_biases_TRGB_magnitude_field_ManticoreLocalCOLA42"
     "_infersel_student_t_bmin10_smooth4_0_gpu_merged.npz"
 )

@@ -29,12 +29,12 @@ from matplotlib.colors import Normalize  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.ticker import MaxNLocator  # noqa: E402
 from scipy.stats import gaussian_kde  # noqa: E402
-from trgbh0_plot_style import (FIGURE_DPI, ROOT,  # noqa: E501,E402,F401
+from trgbh0_plot_style import (FIGURE_DPI, RESULTS_ROOT, ROOT,  # noqa: E501,E402,F401
                                save_pdf_png, set_paper_rc, trgbh0_cmap)
 
 TASK_FILE = ROOT / "scripts" / "runs" / "tasks_TRGBH0_single.txt"
 DEFAULT_OUTDIR = (
-    ROOT / "results" / "TRGBH0_paper" / "single_fields"
+    RESULTS_ROOT / "results" / "TRGBH0_paper" / "single_fields"
     / "plots" / "single_field_comparison"
 )
 MAX_KDE_SAMPLES = 40_000
@@ -220,7 +220,8 @@ def output_spec(
         "mas": mas,
         "reconstruction": reconstruction,
         "config": str(config_path),
-        "source": str(repo_path(get_nested(config, ("io", "fname_output")))),
+        "source": str(RESULTS_ROOT / get_nested(
+            config, ("io", "fname_output"))),
         "cz_likelihood": config_likelihood,
         "smooth_R": config_smooth_R,
         "beta_prior_dist": config_beta_prior_dist,

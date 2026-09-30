@@ -29,11 +29,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import scienceplots  # noqa: F401,E402
-from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR, ROOT,  # noqa: E402
-                               TRGBH0_COLOURS, save_pdf_png, set_paper_rc)
+from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR,  # noqa: E402
+                               RESULTS_ROOT, TRGBH0_COLOURS, save_pdf_png,
+                               set_paper_rc)
 
 DEFAULT_RESULTS_DIR = (
-    ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
+    RESULTS_ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
 DEFAULT_OUTDIR = OUTPUT_DIR / "trgbh0_single_smoothed_evidence_drivers"
 FILE_GLOB = "*_single_smoothed.hdf5"
 AUX = {

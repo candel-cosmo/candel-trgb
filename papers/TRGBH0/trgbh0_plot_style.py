@@ -6,15 +6,18 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-from candel.util import CANDEL_ROOT
+from candel.util import CANDEL_ROOT, data_path, results_path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PACKAGE_ROOT = SCRIPT_DIR.parents[1]
 ROOT = CANDEL_ROOT
+# Directories holding data/ and results/ (root_data/root_results).
+DATA_ROOT = Path(data_path())
+RESULTS_ROOT = Path(results_path())
 OUTPUT_DIR = SCRIPT_DIR / "output"
 PAPER_DIR = ROOT.parent / "Papers" / "TRGBH0"
 PAPER_FIGURE_DIR = PAPER_DIR / "Figures"
-TRGBH0_RESULTS = ROOT / "results" / "TRGBH0_paper"
+TRGBH0_RESULTS = RESULTS_ROOT / "results" / "TRGBH0_paper"
 TRGBH0_TABLE_RESULTS = TRGBH0_RESULTS / "table"
 FIGURE_DPI = 500
 

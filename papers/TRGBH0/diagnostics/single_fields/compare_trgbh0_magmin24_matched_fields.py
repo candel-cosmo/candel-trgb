@@ -30,7 +30,8 @@ try:
 except ModuleNotFoundError:
     scienceplots = None
 
-from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR, ROOT,  # noqa: E402,F401
+from trgbh0_plot_style import (FIGURE_DPI, OUTPUT_DIR,  # noqa: E402,F401
+                               RESULTS_ROOT, ROOT,
                                save_pdf_png, set_paper_rc, trgbh0_cmap)
 
 FIDUCIAL_TASK_FILE = ROOT / "scripts" / "runs" / "tasks_TRGBH0_single.txt"
@@ -176,7 +177,7 @@ def select_specs(task_file, mag_min):
             task=task_index,
             field=field,
             config=config_path,
-            output=repo_path(get_nested(config, ("io", "fname_output"))),
+            output=RESULTS_ROOT / get_nested(config, ("io", "fname_output")),
             mag_min=mag_min,
         )
         if field in specs:

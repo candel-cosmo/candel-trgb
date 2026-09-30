@@ -27,14 +27,14 @@ from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 from plot_trgbh0_single_smoothed_sets_diagnostics import (  # noqa: E402
     by_field_lnz, grouped_by_set, load_rows, matched_fields)
-from trgbh0_plot_style import (PAPER_FIGURE_DIR, ROOT,  # noqa: E402
+from trgbh0_plot_style import (PAPER_FIGURE_DIR, RESULTS_ROOT,  # noqa: E402
                                save_pdf_png, set_paper_rc)
 
 DEFAULT_RESULTS_DIR = (
-    ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
+    RESULTS_ROOT / "results" / "TRGBH0_paper" / "single_fields_smoothed")
 # Realisation-marginalised counterparts of the same variants (one chain each,
 # the field marginalised inside the likelihood) live alongside the table runs.
-DEFAULT_MARGINALISED_DIR = ROOT / "results" / "TRGBH0_paper" / "table"
+DEFAULT_MARGINALISED_DIR = RESULTS_ROOT / "results" / "TRGBH0_paper" / "table"
 DEFAULT_OUT = (
     SCRIPT_DIR.parents[1] / "output" / "trgbh0_single_smoothed_sets"
     / "trgbh0_single_smoothed_grid.pdf")

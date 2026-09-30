@@ -20,7 +20,7 @@ import tempfile
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-PLOT_DIR = next(p for p in SCRIPT_DIR.parents if p.name == "paper_TRGBH0")
+PLOT_DIR = next(p for p in SCRIPT_DIR.parents if p.name == "TRGBH0")
 if str(PLOT_DIR) not in sys.path:
     sys.path.insert(0, str(PLOT_DIR))
 

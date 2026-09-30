@@ -10,15 +10,15 @@ from pathlib import Path
 
 import h5py
 import matplotlib
-from trgbh0_plot_style import (FIGURE_DPI, RESULTS_ROOT, set_paper_rc,
-                               trgbh0_cmap)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
-                if path.name == "paper_TRGBH0")
+                if path.name == "TRGBH0")
 for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+from trgbh0_plot_style import (  # noqa: E402
+    FIGURE_DPI, RESULTS_ROOT, set_paper_rc, trgbh0_cmap)
 
 
 matplotlib.use("Agg")

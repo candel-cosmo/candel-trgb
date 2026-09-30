@@ -6,14 +6,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-from trgbh0_plot_style import OUTPUT_DIR
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
-                if path.name == "paper_TRGBH0")
+                if path.name == "TRGBH0")
 for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+from trgbh0_plot_style import OUTPUT_DIR  # noqa: E402
 
 
 TEX_FILE = SCRIPT_DIR / "trgb_forward_model_dag.tex"

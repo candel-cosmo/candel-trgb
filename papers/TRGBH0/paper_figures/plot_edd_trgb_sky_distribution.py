@@ -10,14 +10,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from edd_trgb_plot_data import PAPER_RC, load_edd_trgb_plot_data, save_figure
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
-                if path.name == "paper_TRGBH0")
+                if path.name == "TRGBH0")
 for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+from edd_trgb_plot_data import (  # noqa: E402
+    PAPER_RC, load_edd_trgb_plot_data, save_figure)
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/candel_mplconfig")
 

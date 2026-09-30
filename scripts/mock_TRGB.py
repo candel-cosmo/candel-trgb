@@ -1335,6 +1335,9 @@ def main():
     if not os.path.isabs(args.config):
         args.config = os.path.join(REPO_ROOT, args.config)
 
+    # A relative --outdir means relative to where the script was launched.
+    args.outdir = os.path.abspath(args.outdir)
+
     # Ensure CWD is repo root so relative data paths in config work.
     os.chdir(REPO_ROOT)
 

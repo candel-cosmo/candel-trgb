@@ -12,9 +12,9 @@ from trgbh0_plot_style import save_figure as save_figure_common
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = (
-    SCRIPT_DIR if SCRIPT_DIR.name == "paper_TRGBH0"
+    SCRIPT_DIR if SCRIPT_DIR.name == "TRGBH0"
     else next(path for path in SCRIPT_DIR.parents
-              if path.name == "paper_TRGBH0")
+              if path.name == "TRGBH0")
 )
 for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:

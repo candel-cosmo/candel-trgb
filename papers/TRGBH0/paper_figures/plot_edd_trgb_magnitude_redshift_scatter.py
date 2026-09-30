@@ -9,15 +9,16 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from edd_trgb_plot_data import OUTDIR, PAPER_RC, load_edd_trgb_plot_data
-from trgbh0_plot_style import TRGBH0_COLOURS
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
-                if path.name == "paper_TRGBH0")
+                if path.name == "TRGBH0")
 for path in (SCRIPT_DIR, PLOT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
+from edd_trgb_plot_data import (  # noqa: E402
+    OUTDIR, PAPER_RC, load_edd_trgb_plot_data)
+from trgbh0_plot_style import TRGBH0_COLOURS  # noqa: E402
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/candel_mplconfig")
 

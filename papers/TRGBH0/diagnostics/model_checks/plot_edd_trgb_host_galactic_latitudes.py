@@ -15,7 +15,7 @@ import candel
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PLOT_DIR = next(path for path in SCRIPT_DIR.parents
-                if path.name == "paper_TRGBH0")
+                if path.name == "TRGBH0")
 if str(PLOT_DIR) not in sys.path:
     sys.path.insert(0, str(PLOT_DIR))
 

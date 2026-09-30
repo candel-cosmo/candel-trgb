@@ -22,7 +22,7 @@ import healpy as hp
 import numpy as np
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-PLOT_DIR = next(p for p in SCRIPT_DIR.parents if p.name == "paper_TRGBH0")
+PLOT_DIR = next(p for p in SCRIPT_DIR.parents if p.name == "TRGBH0")
 for _path in (SCRIPT_DIR, PLOT_DIR):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
